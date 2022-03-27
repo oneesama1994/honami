@@ -42,18 +42,19 @@ function naturalCompare(s1, s2) {
   const directories = await getDirectories("content/");
 
   for (const dir of directories) {
+    const filePaths = await searchFiles(`content/${dir}/*.{png,jpg,jpeg,webp}`);
+    if (filePaths.length === 0) {
+      continue;
+    }
+    filePaths.sort(naturalCompare);
+
+    // Clean up existing files for folders that need to be processed
     const trackedFilePaths = await searchFiles(
       `content/${dir}/*.{gnp,gpj,gepj,pbew}`
     );
     for (const trackedFilePath of trackedFilePaths) {
       await fsPromises.unlink(trackedFilePath);
     }
-
-    const filePaths = await searchFiles(`content/${dir}/*.{png,jpg,jpeg,webp}`);
-    if (filePaths.length === 0) {
-      continue;
-    }
-    filePaths.sort(naturalCompare);
 
     // Create thumbnail
     const thumbnailPath = `content/${dir}/thumbnail.webp`;
